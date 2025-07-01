@@ -1,0 +1,24 @@
+# Dockerfile for Ollama sidecar with Gemma-3-27B pre-loaded
+FROM ollama/ollama
+
+# Listen on all interfaces, port 11434
+ENV OLLAMA_HOST=0.0.0.0:11434
+
+# Store model weight files in /models (optional, default is /root/.ollama)
+ENV OLLAMA_MODELS=/models
+
+# Reduce logging verbosity
+ENV OLLAMA_DEBUG=false
+
+# Never unload model weights from the GPU
+ENV OLLAMA_KEEP_ALIVE=-1
+
+# Set Gin to release mode (less verbose)
+ENV GIN_MODE=release
+
+# Pre-pull the Gemma-3-27B model (change model name if needed)
+ENV MODEL=gemma3:27b
+RUN ollama serve & sleep 5 && ollama pull $MODEL
+
+# Start Ollama
+ENTRYPOINT ["ollama", "serve"] 
