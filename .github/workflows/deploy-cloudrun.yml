@@ -8,8 +8,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-      REGION: ${{ secrets.GCP_REGION }}
       SERVICE: openwebui
       REPO: openwebui-repo
       IMAGE: openwebui
@@ -17,17 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Print env vars
+      - name: Print secrets directly
         run: |
-          echo "PROJECT_ID=${{ env.PROJECT_ID }}"
-          echo "REGION=${{ env.REGION }}"
           echo "GCP_PROJECT=${{ secrets.GCP_PROJECT }}"
           echo "GCP_REGION=${{ secrets.GCP_REGION }}"
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ secrets.GCP_PROJECT }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
@@ -47,20 +43,20 @@ jobs:
         run: gcloud info --format='get(config.account)'
 
       - name: List Artifact Registry repos
-        run: gcloud artifacts repositories list --project=${{ env.PROJECT_ID }} --location=${{ env.REGION }}
+        run: gcloud artifacts repositories list --project=${{ secrets.GCP_PROJECT }} --location=${{ secrets.GCP_REGION }}
 
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile --tag us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }} .
+          docker build -f Dockerfile --tag us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }}
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE }} \
-            --image=us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }} \
-            --region=${{ env.REGION }} \
+            --image=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }} \
+            --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated 
