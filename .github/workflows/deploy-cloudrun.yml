@@ -44,6 +44,13 @@ jobs:
     - name: List Artifact Registry repos
       run: gcloud artifacts repositories list --project=${{ env.PROJECT_ID }} --location=${{ env.REGION }}
 
+    - name: Print env vars
+      run: |
+        echo "PROJECT_ID=${{ env.PROJECT_ID }}"
+        echo "REGION=${{ env.REGION }}"
+        echo "GCP_PROJECT=${{ secrets.GCP_PROJECT }}"
+        echo "GCP_REGION=${{ secrets.GCP_REGION }}"
+
     - name: Build Docker image
       run: |
         docker build -f Dockerfile --tag us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }} .
