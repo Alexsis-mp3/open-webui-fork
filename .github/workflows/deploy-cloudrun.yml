@@ -2,13 +2,13 @@ name: Deploy to Google Cloud Run
 
 on:
   push:
-    branches: [ main, gcloud ]
+    branches: [ gcloud ]
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
   REGION: ${{ secrets.GCP_REGION }}
   SERVICE: openwebui
-  REPO: ollama-sidecar-codelab-repo
+  REPO: openwebui-repo
   IMAGE: openwebui
 
 jobs:
