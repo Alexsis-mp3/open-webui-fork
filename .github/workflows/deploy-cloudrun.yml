@@ -29,6 +29,15 @@ jobs:
     - name: Configure Docker for Artifact Registry
       run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
+    - name: Print gcloud auth info
+      run: gcloud auth list
+
+    - name: Print gcloud config
+      run: gcloud config list
+
+    - name: Whoami
+      run: gcloud info --format='get(config.account)'
+
     - name: Build Docker image
       run: |
         docker build -f Dockerfile --tag us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }} .
